@@ -164,7 +164,7 @@ In Zed, use `agent: create skill from url` and provide a GitHub Markdown URL to 
 Latest:
 
 ```text
-https://raw.githubusercontent.com/0x12th/engineering-architecture-review/main/SKILL.md
+https://raw.githubusercontent.com/0x12th/engineering-architecture-review/master/SKILL.md
 ```
 
 Pinned version:
