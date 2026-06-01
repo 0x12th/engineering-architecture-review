@@ -1,20 +1,81 @@
 # Engineering Architecture Review
 
-Stop getting architecture reviews that recommend:
+Engineering Architecture Review is an AI skill for practical architecture reviews. It helps coding agents inspect real systems, challenge weak proposals, and recommend incremental changes based on evidence, confidence, operational cost, migration risk, ownership, reliability, performance, and long-term maintenance.
 
-- microservices for everything
-- rewrites without evidence
-- "clean architecture" for its own sake
+Use it when you want:
 
-Engineering Architecture Review is a reusable AI skill that helps coding agents analyze real systems and recommend practical, incremental improvements based on operational cost, migration risk, ownership, reliability, performance, and long-term maintenance.
+- a short architecture scan with the highest-value findings;
+- a focused review of one subsystem, migration, deployment path, or reliability concern;
+- a design challenge that tests whether a proposed architecture change should exist at all;
+- a small implementation follow-up after findings are already established.
 
-Works with:
+## Installation
 
-- Zed
-- Claude Code
-- GPT-based coding agents
-- Claude-based coding agents
-- Any agent that supports skills or prompt-based instructions
+### Zed: import from URL
+
+In Zed, use `agent: create skill from url` and provide a GitHub Markdown URL to the root `SKILL.md`.
+
+Latest:
+
+```text
+https://raw.githubusercontent.com/0x12th/engineering-architecture-review/master/SKILL.md
+```
+
+Pinned version:
+
+```text
+https://raw.githubusercontent.com/0x12th/engineering-architecture-review/v0.2.0/SKILL.md
+```
+
+This imports `SKILL.md`. If you also want `templates/` and `examples/`, use the clone-based installation below.
+
+### Install latest with templates
+
+```sh
+git clone https://github.com/0x12th/engineering-architecture-review.git
+mkdir -p ~/.agents/skills
+cp -R engineering-architecture-review ~/.agents/skills/engineering-architecture-review
+```
+
+### Install pinned version with templates
+
+```sh
+git clone --branch v0.2.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
+mkdir -p ~/.agents/skills
+cp -R engineering-architecture-review ~/.agents/skills/engineering-architecture-review
+```
+
+### Claude Code
+
+```sh
+git clone --branch v0.2.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
+mkdir -p ~/.claude/skills
+cp -R engineering-architecture-review ~/.claude/skills/engineering-architecture-review
+```
+
+If Claude Code does not auto-load the skill, reference it from `CLAUDE.md` or your prompt:
+
+```text
+For architecture review tasks, follow the instructions in .claude/skills/engineering-architecture-review/SKILL.md.
+```
+
+### Project-local installation
+
+For Zed:
+
+```sh
+git clone --branch v0.2.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
+mkdir -p <project>/.agents/skills
+cp -R engineering-architecture-review <project>/.agents/skills/engineering-architecture-review
+```
+
+For Claude Code:
+
+```sh
+git clone --branch v0.2.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
+mkdir -p <project>/.claude/skills
+cp -R engineering-architecture-review <project>/.claude/skills/engineering-architecture-review
+```
 
 ## Why This Exists
 
@@ -97,10 +158,10 @@ Each finding includes:
 
 - severity
 - impact
+- evidence or uncertainty
 - root cause
 - minimal fix
 - expected benefit
-- evidence or uncertainty
 
 ## Example Finding
 
@@ -116,6 +177,12 @@ High
 Impact:
 Multiple users can trigger parallel downloads and exhaust CPU, network bandwidth, or disk I/O.
 
+Evidence:
+Download requests start work directly, and no global queue, semaphore, or saturation metric is visible.
+
+Root cause:
+Concurrency is controlled per request path instead of through a shared resource limit.
+
 Minimal fix:
 Introduce a global semaphore and expose queue saturation metrics.
 
@@ -130,20 +197,20 @@ Quick scan output is intentionally short:
 1. Global concurrency limit missing
    Severity: High
    Impact: Under load, worker fan-out can overload the database or external provider and cause cascading failures.
-   Minimal fix: Add a bounded concurrency limit and expose saturation metrics before increasing worker count.
    Evidence: Worker configuration defines per-process concurrency, but no global limit or queue-age metric is visible.
+   Minimal fix: Add a bounded concurrency limit and expose saturation metrics before increasing worker count.
 
 2. Health checks do not verify Redis
    Severity: Medium
    Impact: The service can report healthy while request paths depending on Redis are failing.
-   Minimal fix: Add a readiness check for Redis-dependent paths or expose degraded readiness for cache/session failures.
    Evidence: Health endpoint only verifies process liveness and database connectivity.
+   Minimal fix: Add a readiness check for Redis-dependent paths or expose degraded readiness for cache/session failures.
 
 3. Schema migration rollback is not defined
    Severity: High
    Impact: A failed deploy can leave old and new code incompatible with the database schema.
-   Minimal fix: Use an expand/contract migration plan and document rollback or roll-forward steps.
    Evidence: Migration files exist, but deployment docs do not describe compatibility, rollback, or verification.
+   Minimal fix: Use an expand/contract migration plan and document rollback or roll-forward steps.
 ```
 
 More examples:
@@ -152,74 +219,6 @@ More examples:
 - `examples/focused-review.md`
 - `examples/design-challenge.md`
 - `examples/implementation-mode.md`
-
-## Installation
-
-### Zed: import from URL
-
-In Zed, use `agent: create skill from url` and provide a GitHub Markdown URL to `SKILL.md`.
-
-Latest:
-
-```text
-https://raw.githubusercontent.com/0x12th/engineering-architecture-review/master/SKILL.md
-```
-
-Pinned version:
-
-```text
-https://raw.githubusercontent.com/0x12th/engineering-architecture-review/v0.1.0/SKILL.md
-```
-
-This imports `SKILL.md`. If you also want `templates/` and `examples/`, use the clone-based installation below.
-
-### Install latest with templates
-
-```sh
-git clone https://github.com/0x12th/engineering-architecture-review.git
-mkdir -p ~/.agents/skills
-cp -R engineering-architecture-review ~/.agents/skills/engineering-architecture-review
-```
-
-### Install pinned version with templates
-
-```sh
-git clone --branch v0.1.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
-mkdir -p ~/.agents/skills
-cp -R engineering-architecture-review ~/.agents/skills/engineering-architecture-review
-```
-
-### Claude Code
-
-```sh
-git clone --branch v0.1.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
-mkdir -p ~/.claude/skills
-cp -R engineering-architecture-review ~/.claude/skills/engineering-architecture-review
-```
-
-If Claude Code does not auto-load the skill, reference it from `CLAUDE.md` or your prompt:
-
-```text
-For architecture review tasks, follow the instructions in .claude/skills/engineering-architecture-review/SKILL.md.
-```
-
-### Project-local installation
-
-For Zed:
-
-```sh
-git clone --branch v0.1.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
-mkdir -p <project>/.agents/skills
-cp -R engineering-architecture-review <project>/.agents/skills/engineering-architecture-review
-```
-
-For Claude Code:
-
-```sh
-git clone --branch v0.1.0 --depth 1 https://github.com/0x12th/engineering-architecture-review.git
-mkdir -p <project>/.claude/skills
-cp -R engineering-architecture-review <project>/.claude/skills/engineering-architecture-review
-```
 
 ## What It Reviews
 
@@ -243,7 +242,7 @@ The skill guides an agent to review systems across these areas:
 | Focused review | You want one subsystem, service, module, migration, performance issue, or deployment path reviewed | Scoped findings and next steps |
 | Full review | You want a broad system architecture assessment | Architecture model, findings, roadmap, uncertainty |
 | Implementation mode | You want the agent to make small architecture-improving changes | Small edits, validation, summary |
-| Design challenge mode | You want critique of a proposed design or migration plan | Strengths, weak assumptions, risks, alternatives |
+| Design challenge mode | You want critique of a proposed design or migration plan | Assumptions, missing evidence, alternatives, cost comparison, recommendation, confidence |
 
 ## Non-goals
 

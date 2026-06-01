@@ -2,6 +2,25 @@
 
 All notable changes to this skill are documented in this file.
 
+## 0.2.0 - 2026-06-01
+
+### Added
+
+- Architecture Decision Framework for challenging assumptions, comparing alternatives, validating problem existence, and applying confidence gates.
+- Evidence Collection Rules for bounded quick scans, stop conditions, early findings, and finding quality.
+- Prioritization and cost/benefit guidance that separates severity from what should be worked on next.
+
+### Changed
+
+- Design challenge mode now argues against weak proposals instead of only improving them.
+- Quick scan mode now favors fewer high-value findings, disciplined exploration, and concise findings-only output.
+- Review mode and implementation mode are now explicitly separated.
+
+### Improved
+
+- README installation flow now surfaces setup earlier and pins examples to `v0.2.0`.
+- Examples now match the updated quick scan and design challenge output formats.
+
 ## 0.1.0 - 2026-05-31
 
 ### Added

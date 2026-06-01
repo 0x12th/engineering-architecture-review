@@ -9,18 +9,35 @@ Challenge this proposal: split the monolith into separate services for billing, 
 Example output:
 
 ```md
-## What the proposal gets right
+## What is likely correct
 
 - Billing, notifications, and reporting likely have different change rates and reliability needs.
 - Clearer boundaries could reduce accidental coupling if the current modules are tightly intertwined.
 - Reporting may benefit from a separate read model if it creates database contention for transactional paths.
 
-## Weak assumptions or missing evidence
+## Assumptions that may be wrong
 
 - The proposal assumes deployment separation is required before proving module boundaries are stable.
 - It does not show that one team can own each extracted service independently.
-- It does not describe data ownership, migration order, dual writes, rollback, or correctness validation.
-- It does not estimate the new operational surface: deploy pipelines, alerts, dashboards, runbooks, incidents, and capacity management.
+- It assumes three services reduce long-term complexity instead of moving complexity into deployment and operations.
+
+## Missing evidence
+
+- Current change frequency, incident history, deploy contention, and scaling pressure are not shown.
+- Data ownership, migration order, dual writes, rollback, and correctness validation are not described.
+- The new operational surface is not estimated: deploy pipelines, alerts, dashboards, runbooks, incidents, and capacity management.
+
+## Alternatives considered
+
+1. Current state: keep one deployable and accept the current coupling until measured pain is clear.
+2. Minimal change: define internal module boundaries, ownership, and contract tests before changing deployment shape.
+3. Proposed option: extract billing, notifications, and reporting into separate services.
+
+## Cost comparison
+
+- Current state cost: Unknown until change delay, reliability incidents, scaling limits, or ownership conflicts are measured.
+- Minimal change cost: Low to medium; mostly refactoring, tests, documentation, and ownership clarification.
+- Proposed option cost: High; requires migration, service operations, compatibility layers, observability, rollout, rollback, and long-term ownership.
 
 ## Risks
 
@@ -30,16 +47,11 @@ Example output:
 - Performance risk: Reporting service calls may add network overhead unless reporting uses an intentional read model or async projection.
 - Maintenance risk: Shared libraries or shared database tables can recreate monolith coupling with more operational complexity.
 
-## Lower-complexity alternatives
-
-1. First define internal module boundaries for billing, notifications, and reporting inside the monolith.
-2. Add contract tests around module APIs and data ownership.
-3. Move reporting reads to a separate read model if database contention is the proven bottleneck.
-4. Extract only the boundary with a clear independent scaling, ownership, deployment, or reliability benefit.
-
 ## Recommendation
 
 Do not split all three services now. Stabilize module and data boundaries first, add observability around contention and change hotspots, then reassess whether one targeted extraction is justified.
 
-Confidence: Medium. The recommendation should be revisited if production metrics show strong independent scaling needs or if ownership is already split across teams.
+## Confidence level
+
+Medium. The recommendation should be revisited if production metrics show strong independent scaling needs or if ownership is already split across teams.
 ```
